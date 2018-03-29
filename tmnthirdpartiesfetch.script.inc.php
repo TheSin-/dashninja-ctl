@@ -182,6 +182,15 @@ if ($res !== false) {
   $res = $res[0];
   if (($res !== false) && is_array($res) && array_key_exists('symbol',$res) && ($res['symbol'] == 'TRC') && array_key_exists('last_updated',$res)) {
     $tbstamp = date('Y-m-d H:i:s',$res['last_updated']);
+    if (array_key_exists('price_btc',$res)) {
+      $tp["btctrc"] = array("StatValue" => $res["price_btc"],
+                                  "LastUpdate" => intval($res['last_updated']),
+                                  "Source" => "coinmarketcap");
+      $resdone++;
+    }
+    else {
+      echo "Failed (JSON/price_btc) ";
+    }
     if (array_key_exists('rank',$res)) {
       $tp["marketcappos"] = array("StatValue" => $res["rank"],
                                   "LastUpdate" => intval($res['last_updated']),
