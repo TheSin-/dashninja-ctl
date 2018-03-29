@@ -1,5 +1,5 @@
-dmn.config.inc.php
-dashdupdate.php.lasthash
+tmn.config.inc.php
+terracoindupdate.php.lasthash
 .ssh
 .bash_history
 .bash_logout
@@ -7,4 +7,4 @@ dashdupdate.php.lasthash
 .bashrc
 .profile
 .gitconfig
-dmnautoupdate.data.json
+tmnautoupdate.data.json
