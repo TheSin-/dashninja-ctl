@@ -2025,7 +2025,13 @@ if ($argc > 1) {
       echo "Success (".count($nodes)." nodes)\n";
     }
     elseif (($response['http_code'] >= 400) && ($response['http_code'] <= 499)) {
-      echo "Error (".$response['http_code'].": ".$content['message'].")\n";
+      if (!empty($content['message']))
+        echo "Error (".$response['http_code'].": ".$content['message'].")\n";
+      else if (!empty($content['message']))
+        foreach($content['message'] as $msg)
+          echo "Error (".$response['http_code'].": ".$msg.")\n";
+      else
+        echo "Error (".$response['http_code'].": Unknown)\n";
     }
   }
   else {
