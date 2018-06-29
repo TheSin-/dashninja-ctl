@@ -23,7 +23,7 @@ namespace Terracoin;
 
 use Exception;
 
-define('PROTOCOL_VERSION',70206);
+define('PROTOCOL_VERSION',70208);
 define('PROTOCOL_MAGIC',"\x42\xba\xbe\x56");
 define('HRVERSION',"/Terracoin Core:%s/TRC Ninja Port Checker:%s.%d/");
 define('THISVERSION',4);
@@ -52,7 +52,7 @@ class Node {
         private $subver;
         private $prot_magic;
 
-	public function __construct($ip, $port = 13333, $timeout = 5, $versionid = '1.0.0', $sversionid = '0.12.1.8', $protver = PROTOCOL_VERSION, $prot_magic = PROTOCOL_MAGIC) {
+	public function __construct($ip, $port = 13333, $timeout = 5, $versionid = '1.0.0', $sversionid = '0.12.2.3', $protver = PROTOCOL_VERSION, $prot_magic = PROTOCOL_MAGIC) {
 		$this->sock = @fsockopen($ip, $port, $errno, $errstr, $timeout);
 		if (!$this->sock) throw new Exception($errstr, $errno);
 
