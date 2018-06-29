@@ -73,7 +73,7 @@ if ($datanew != $dataold) {
   $fnamnew = "/opt/terracoind/0.12/terracoind-$versionraw";
   rename($fnam,$fnamnew);
   echo "OK... Submitting to DB: ";
-  passthru("tmnctl version $fnamnew $versionraw 1 1");
+  passthru(TMN_DIR."/tmnctl version $fnamnew $versionraw 1 1");
   echo "OK\n";
   chdir($curdir);
   local_delTree($tmpdir);
