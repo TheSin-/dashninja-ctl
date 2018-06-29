@@ -39,7 +39,7 @@ function delTree($dir) {
 
 xecho("terracoind auto updater (testnet) v1.0\n");
 xecho("Retrieving current latest binary date and size: ");
-$test = get_headers("https://terracoin.io/bin/terracoin-core-current/terracoin-0.12.1-x86_64-linux-gnu.tar.gz", 1);
+$test = get_headers("https://terracoin.io/bin/terracoin-core-current/terracoin-0.12.2-x86_64-linux-gnu.tar.gz", 1);
 echo $test["Last-Modified"]."\n";
 
 $datanew = sha1(serialize(array("Last-Modified" => $test["Last-Modified"],
@@ -63,11 +63,11 @@ if ($datanew != $dataold) {
   $tmpdir = tempdir("terracoindupdater");
   $curdir = getcwd();
   chdir($tmpdir);
-  passthru("wget -q https://terracoin.io/bin/terracoin-core-current/terracoin-0.12.1-x86_64-linux-gnu.tar.gz");
+  passthru("wget -q https://terracoin.io/bin/terracoin-core-current/terracoin-0.12.2-x86_64-linux-gnu.tar.gz");
   echo "OK... Untar: ";
-  passthru("tar xvf terracoin-0.12.1-x86_64-linux-gnu.tar.gz");
+  passthru("tar xvf terracoin-0.12.2-x86_64-linux-gnu.tar.gz");
   echo "OK... Version: ";
-  $fnam = $tmpdir."/terracoin-0.12.1/bin/terracoind";
+  $fnam = $tmpdir."/terracoin-0.12.2/bin/terracoind";
   $versionraw = tmn_terracoindversion($fnam);
   echo $versionraw."... Moving: ";
   $fnamnew = "/opt/terracoind/0.12/terracoind-$versionraw";
