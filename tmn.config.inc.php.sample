@@ -96,7 +96,7 @@ DEFINE('TMN_TRCWHALE_PARTNERID', '000000000000');
 
 // Auto-Update URLs
 //  Testnet binary (Terracoin server)
-DEFINE('TMN_AUTOUPDATE_TEST','https://terracoin.io/bin/terracoin-core-current/terracoin-0.12.1-x86_64-linux-gnu.tar.gz');
+DEFINE('TMN_AUTOUPDATE_TEST','https://terracoin.io/bin/terracoin-core-current/terracoin-0.12.2-x86_64-linux-gnu.tar.gz');
 //  Semaphore
 DEFINE('TMN_AUTOUPDATE_SEMAPHORE','/var/run/tmnautoupdate.pid');
 
