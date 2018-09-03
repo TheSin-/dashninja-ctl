@@ -57,8 +57,11 @@ DEFINE('TMN_NRCOUNTLOG','/var/log/tmn/nrcount.log');
 // Parallel threads (for start-stop and RPC commands)
 DEFINE('TMN_THREADS_MAX',8);
 
-DEFINE('TMN_CTLSTATUSAUTO_MAIN_SEMAPHORE','/var/run/tmnctlstatusauto0.pid');
-DEFINE('TMN_CTLSTATUSAUTO_TEST_SEMAPHORE','/var/run/tmnctlstatusauto1.pid');
+// Semaphores
+//   ctl auto status
+DEFINE('TMN_CTLSTATUSAUTO_SEMAPHORE','/var/run/tmnctlstatusauto%d.pid');
+//   dbgen
+DEFINE('TMN_DBGEN_SEMAPHORE','/var/run/tmndbgen.pid');
 
 // Port checker specifics
 //  Semaphore for multi-threading (only allow 1 instance)

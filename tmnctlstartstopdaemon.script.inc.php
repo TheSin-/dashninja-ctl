@@ -23,7 +23,7 @@ if (!defined('TMN_SCRIPT') || !defined('TMN_CONFIG') || (TMN_SCRIPT !== true) ||
   die('Not executable');
 }
 
-define('TMN_VERSION','1.2.4');
+define('TMN_VERSION','1.2.5');
 
 // Start the masternodes
 function tmn_start($uname,$conf,$terracoind,$extra="") {
@@ -36,8 +36,8 @@ function tmn_start($uname,$conf,$terracoind,$extra="") {
     $res = true;
   }
   else {
-    $tmnenabled = ($conf->getmnctlconfig('enable') == 1);
-    if ($tmnenabled) {
+//    $tmnenabled = ($conf->getmnctlconfig('enable') == 1);
+//    if ($tmnenabled) {
       $RUNASUID = tmn_getuid($uname,$RUNASGID);
       if ($testnet) {
         $nice = TMN_NICELEVEL_TEST;
@@ -49,7 +49,7 @@ function tmn_start($uname,$conf,$terracoind,$extra="") {
       $res = false;
       while ((!$res) && (!tmn_checkpid(tmn_getpid($uname,$testnet))) && ($trycount < 3)) {
         echo "T$trycount.";
-        exec("/sbin/start-stop-daemon -S -c $RUNASUID:$RUNASGID -N " . $nice . " -x " . $terracoind . " -u $RUNASUID -a " . $terracoind . " -q -b -- -daemon $extra");
+        exec("/sbin/start-stop-daemon -S -c $RUNASUID:$RUNASGID -N " . $nice . " -x /usr/bin/env MALLOC_ARENA_MAX=1 " . $terracoind . " -u $RUNASUID -q -- -daemon $extra");
         usleep(250000);
         $waitcount = 0;
         while ((!tmn_checkpid(tmn_getpid($uname, $testnet))) && ($waitcount < TMN_STOPWAIT)) {
@@ -66,11 +66,11 @@ function tmn_start($uname,$conf,$terracoind,$extra="") {
           echo "Could not start!";
         };
       }
-    }
-    else {
-      echo "DISABLED";
-      $res = true;
-    }
+//    }
+//    else {
+//      echo "DISABLED";
+//      $res = true;
+//    }
   }
   return $res;
 

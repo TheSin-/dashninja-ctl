@@ -23,7 +23,7 @@ if (!defined('TMN_SCRIPT') || !defined('TMN_CONFIG') || (TMN_SCRIPT !== true) ||
   die('Not executable');
 }
 
-DEFINE('TMN_VERSION','2.7.1');
+DEFINE('TMN_VERSION','2.8.0');
 
 function tmnpidcmp($a, $b)
 {
@@ -55,7 +55,7 @@ function tmn_getcountry($mnip,&$countrycode) {
 function tmn_getip($pid,$uname) {
 
   $res = false;
-  exec('netstat -ntpl | grep "tcp  " | egrep ":[13333|18321]" | grep "'.$pid.'/terracoind"',$output,$retval);
+  exec('netstat -ntpl | grep "tcp  " | egrep ":([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])" | grep "'.$pid.'/terracoind"',$output,$retval);
   if (isset($output[0])) {
     if (preg_match("/tcp        0      0 (\d*\.\d*.\d*.\d*:\d*)/", $output[0], $output_array) == 1) {
       $res = $output_array[1];
@@ -423,7 +423,10 @@ function tmn_version_create($versionpath, $versiondisplay, $testnet, $enabled) {
     else {
       echo "Error (Failed to move)\n";
     }
-    if ((substr($versionraw,0,7) == '0.12.1.') || (substr($versionraw,0,7) == '0.12.2.')) {
+    if (substr($versionraw,0,6) == '0.12.3') {
+      $versionhandling = 5;
+    }
+    elseif ((substr($versionraw,0,7) == '0.12.1.') || (substr($versionraw,0,7) == '0.12.2.')) {
       $versionhandling = 4;
     }
     elseif (substr($versionraw,0,5) == '0.12.') {
@@ -744,7 +747,7 @@ function tmn_status($tmnpid,$istestnet) {
   $protocolinfo = array();
   $curprotocol = 0;
   $oldprotocol = 99999;
-  $mnstatusexvalues = array('ENABLED','EXPIRED','VIN_SPENT','REMOVE','POS_ERROR','','PRE_ENABLED','WATCHDOG_EXPIRED','NEW_START_REQUIRED','UPDATE_REQUIRED');
+  $mnstatusexvalues = array('ENABLED','EXPIRED','VIN_SPENT','REMOVE','POS_ERROR','','PRE_ENABLED','WATCHDOG_EXPIRED','NEW_START_REQUIRED','UPDATE_REQUIRED','POSE_BAN','OUTPOINT_SPENT','SENTINEL_PING_EXPIRED');
 
   $wsstatus = array();
 
@@ -782,12 +785,22 @@ function tmn_status($tmnpid,$istestnet) {
   foreach($tmnpid as $tmnnum => $tmnpidinfo) {
     $uname = $tmnpidinfo['uname'];
     // Only vh 3+
-    if (($tmnpidinfo['pidstatus']) && ($tmnpidinfo['currentbin'] != '') && ($tmnpidinfo['versionhandling'] >= 3)) {
-      $commands[] = array("status" => 0,
-                          "tmnnum" => $tmnnum,
-                          "datatype" => "mnlistfull",
-                          "cmd" => $uname.' "masternode list full"',
-                          "file" => "/dev/shm/tmnctl/$uname.$tmpdate.masternode_list.json");
+    if (($tmnpidinfo['pidstatus']) && ($tmnpidinfo['currentbin'] != '') && ($tmnpidinfo['versionhandling'] >= 3) && ($tmnpidinfo['type'] != 'p2pool')) {
+      // If we are in v12.3+ (vh=5) we use the new JSON output (faster and easier)
+      if ($tmnpidinfo['versionhandling'] == 5) {
+           $commands[] = array("status" => 0,
+               "tmnnum" => $tmnnum,
+               "datatype" => "mnlistfull",
+               "cmd" => $uname . ' "masternodelist json"',
+               "file" => "/dev/shm/tmnctl/$uname.$tmpdate.masternode_list.json");
+       }
+       else {
+           $commands[] = array("status" => 0,
+               "tmnnum" => $tmnnum,
+               "datatype" => "mnlistfull",
+               "cmd" => $uname . ' "masternode list full"',
+               "file" => "/dev/shm/tmnctl/$uname.$tmpdate.masternode_list.json");
+       }
       // v12.1 (vh=4)
       if ($tmnpidinfo['versionhandling'] >= 4) {
         $commands[] = array("status" => 0,
@@ -1176,14 +1189,11 @@ function tmn_status($tmnpid,$istestnet) {
         // Retrieve the IP from the node
         $ip = tmn_getip($tmnpidinfo['pid'],$uname);
         $tmnip = $ip;
-        $ipexp = explode(':',$ip);
-        $iponly = $ipexp[0];
         $country = tmn_getcountry($ip,$countrycode);
         if ($country === false) {
           $country = 'Unknown';
           $countrycode = '__';
         }
-        $port = $ipexp[1];
 
         // Default values
         $processstatus = 'running';
@@ -1347,7 +1357,7 @@ function tmn_status($tmnpid,$istestnet) {
               }
           }
           // gobject proposals and triggers handling (4) [v12.1]
-          elseif ($tmnpidinfo['versionhandling'] == 4) {
+          elseif (($tmnpidinfo['versionhandling'] == 4) && ($tmnpidinfo['type'] != 'p2pool')) {
               // Store the next superblock
               if (($governancenextsb[$terracoindinfo['testnet']] === false) || ($governancenextsb[$terracoindinfo['testnet']] > intval($tmnpidinfo['getgovernanceinfo']['nextsuperblock']))) {
                 $governancenextsb[$terracoindinfo['testnet']] = intval($tmnpidinfo['getgovernanceinfo']['nextsuperblock']);
@@ -1458,21 +1468,45 @@ function tmn_status($tmnpid,$istestnet) {
           }
 
           // Parse the masternode list
-          $mn3listfull = $tmnpidinfo['mnlistfull'];
+          if ($tmnpidinfo['type'] == 'p2pool') {
+              $mn3listfull = array();
+          }
+          else {
+              $mn3listfull = $tmnpidinfo['mnlistfull'];
+          }
           foreach($mn3listfull as $mn3output => $mn3data) {
-              // Remove all extra spaces
-            $mn3data = trim($mn3data);
-            do {
-              $rcount = 0;
-              $mn3data = str_replace("  "," ",$mn3data, $rcount);
-            } while ($rcount > 0);
+            if ($tmnpidinfo['versionhandling'] < 5) {
+                // Remove all extra spaces
+                $mn3data = trim($mn3data);
+                do {
+                    $rcount = 0;
+                    $mn3data = str_replace("  ", " ", $mn3data, $rcount);
+                } while ($rcount > 0);
+            }
 
             // Store each value separated by spaces
+            $mn4lastpaidblock = 0;
+            $mn5daemonversion = '';
+            $mn5sentinelversion = '';
+            $mn5sentinelstate = '';
             if ($tmnpidinfo['versionhandling'] == 3) {
               list($mn3status, $mn3protocol, $mn3pubkey, $mn3ipport, $mn3lastseen, $mn3activeseconds, $mn3lastpaid) = explode(" ",$mn3data);
             }
-            else {
+            elseif ($tmnpidinfo['versionhandling'] == 4) {
               list($mn3status, $mn3protocol, $mn3pubkey, $mn3lastseen, $mn3activeseconds, $mn3lastpaid, $mn4lastpaidblock, $mn3ipport) = explode(" ",$mn3data);
+            }
+            else {
+                $mn3status = $mn3data['status'];
+                $mn3protocol = $mn3data['protocol'];
+                $mn3pubkey = $mn3data['payee'];
+                $mn3lastseen = $mn3data['lastseen'];
+                $mn3activeseconds = $mn3data['activeseconds'];
+                $mn3lastpaid = $mn3data['lastpaidtime'];
+                $mn4lastpaidblock = $mn3data['lastpaidblock'];
+                $mn3ipport = $mn3data['address'];
+                $mn5daemonversion = $mn3data['daemonversion'];
+                $mn5sentinelversion = $mn3data['sentinelversion'];
+                $mn5sentinelstate = $mn3data['sentinelstate'];
             }
 
             // Handle the IPs
@@ -1507,7 +1541,11 @@ function tmn_status($tmnpid,$istestnet) {
                                                                          "MasternodePort" => $mn3port,
                                                                          "MasternodeLastSeen" => intval($mn3lastseen),
                                                                          "MasternodeActiveSeconds" => intval($mn3activeseconds),
-                                                                         "MasternodeLastPaid" => $mn3lastpaid);
+                                                                         "MasternodeLastPaid" => $mn3lastpaid,
+                                                                         "MasternodeLastPaidBlock" => intval($mn4lastpaidblock),
+                                                                         "MasternodeDaemonVersion" => $mn5daemonversion,
+                                                                         "MasternodeSentinelVersion" => $mn5sentinelversion,
+                                                                         "MasternodeSentinelState" => $mn5sentinelstate);
             }
             if (($mn3status == "ENABLED") || ($mn3status == "PRE_ENABLED")) {
               $active = 1;
@@ -1720,7 +1758,11 @@ function tmn_status($tmnpid,$istestnet) {
                            "MasternodePort" => $mninfo["MasternodePort"],
                            "MasternodeLastSeen" => $mninfo["MasternodeLastSeen"],
                            "MasternodeActiveSeconds" => $mninfo["MasternodeActiveSeconds"],
-                           "MasternodeLastPaid" => $mninfo["MasternodeLastPaid"]);
+                           "MasternodeLastPaid" => $mninfo["MasternodeLastPaid"],
+                           "MasternodeLastPaidBlock" => $mninfo["MasternodeLastPaidBlock"],
+                           "MasternodeDaemonVersion" => $mninfo["MasternodeDaemonVersion"],
+                           "MasternodeSentinelVersion" => $mninfo["MasternodeSentinelVersion"],
+                           "MasternodeSentinelState" => $mninfo["MasternodeSentinelState"]);
     }
 
     $wsmnlist2 = array();

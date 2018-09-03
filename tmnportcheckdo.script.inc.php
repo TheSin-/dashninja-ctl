@@ -23,7 +23,7 @@ if ((!defined('TMN_SCRIPT')) || (TMN_SCRIPT !== true)) {
   die('This is part of the tmnctl script, run it from there.');
 }
 
-DEFINE('TMN_VERSION','2.1.1');
+DEFINE('TMN_VERSION','2.2.1');
 
 function tmn_checkportopen($ip, $port, $testnet, $config, &$subver, &$errmsg) {
 
@@ -121,6 +121,7 @@ else {
 echo "): ";
 $subver = '';
 $errormsg = '';
+set_time_limit(30);
 $checkres = tmn_checkportopen($ip,$port,$testnet,$config,$subver,$errormsg);
 if ($checkres == 1) {
   $mnstatus = 'open';

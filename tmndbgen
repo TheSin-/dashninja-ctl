@@ -1,8 +1,9 @@
+#!/usr/bin/php
 <?php
 
 /*
     This file is part of TRC Ninja.
-    https://github.com/terracoin/trcninja-ctl
+    https://github.com/terracoin/trcninja-fe
 
     TRC Ninja is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,13 +20,15 @@
 
  */
 
-// Indicate for each of your nodes which one you need to retrieve blocktemplate from (bt) and/or block info (block)
-// Best practice for now is only retrieve block from one node and blocktemplate from all
-$unamelist = array(
-       'tmn01' => array('bt' => true,   'block' => true,    'mempool' => true),
-       'tmn02' => array('bt' => true,   'block' => false,   'mempool' => false),
-       'tmn03' => array('bt' => true,   'block' => false,   'mempool' => false),
-       'tmn04' => array('bt' => true,   'block' => false,   'mempool' => false),
-);
+DEFINE('TMN_SCRIPT',true);
+
+// Load configuration
+require_once('tmn.config.inc.php');
+
+// Load common functions
+require_once('tmn.functions.inc.php');
+
+// Load the script
+require_once('tmndbgen.script.inc.php');
 
 ?>

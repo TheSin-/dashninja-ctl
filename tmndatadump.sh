@@ -18,28 +18,33 @@
 #
 
 # Disable logging by default
+updatelog=/dev/null
 statuslog=/dev/null
-portchecklog=/dev/null
+votesrrdlog=/dev/null
 balancelog=/dev/null
+portchecklog=/dev/null
+blockparserlog=/dev/null
+autoupdatelog=/dev/null
 
 # If parameter 1 is log then enable logging
 if [[ "$1" == "log" ]]; then
   rundate=$(date +%Y%m%d%H%M%S)
+  updatelog=/var/log/tmn/update.$rundate.log
   statuslog=/var/log/tmn/status.$rundate.log
-  portchecklog=/var/log/tmn/status.$rundate.log
-  balancelog=/var/log/tmn/status.$rundate.log
+  votesrrdlog=/var/log/tmn/votesrrd.$rundate.log
+  balancelog=/var/log/tmn/balance.$rundate.log
+  portchecklog=/var/log/tmn/portcheck.$rundate.log
+  blockparserlog=/var/log/tmn/blockparser.$rundate.log
+  autoupdatelog=/var/log/tmn/autoupdate.$rundate.log
 fi
 
 # Sequentially run scripts
-/opt/tmnctl/tmnctl status testnet >> $statuslog
-/usr/bin/php /opt/tmnctl/tmndbgen masternodeactive >> $statuslog
-/usr/bin/php /var/www/trninja/api/cron.php test nodesstatus >> $statuslog
-/usr/bin/php /var/www/trninja/api/cron.php test blocksconsensus >> $statuslog
-/usr/bin/php /var/www/trninja/api/cron.php test votelimit >> $statuslog
-/usr/bin/php /var/www/trninja/api/cron.php test masternodeslistfull >> $statuslog
-/usr/bin/php /var/www/trninja/api/cron.php test governanceproposals >> $statuslog
-/usr/bin/php /var/www/trninja/api/cron.php test governancetriggers >> $statuslog
+#/opt/tmnctl/terracoindupdate >> $updatelog
+/opt/tmnctl/tmnctl status >> $statuslog
+#/opt/tmnctl/tmnvotesrrd >> $votesrrdlog
+/opt/tmnctl/tmnblockparser >> $blockparserlog
 
-/usr/bin/nice -n 19 /opt/tmnctl/tmnportcheck db >> $portchecklog &
-/usr/bin/nice -n 18 /opt/tmnctl/tmnbalance >> $balancelog &
-
+# Concurrently run scripts
+/opt/tmnctl/tmnbalance >> $balancelog &
+/opt/tmnctl/tmnportcheck db >> $portchecklog &
+/opt/tmnctl/tmnautoupdate >> $autoupdatelog &

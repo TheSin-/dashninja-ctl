@@ -23,7 +23,7 @@ if ((!defined('TMN_SCRIPT')) || (TMN_SCRIPT !== true)) {
   die('This is part of the tmnctl script, run it from there.');
 }
 
-DEFINE('TMN_VERSION','2.3.0');
+DEFINE('TMN_VERSION','2.3.1');
 
 // Execute port check commands
 function tmn_portcheck_mt(&$commands) {
@@ -103,7 +103,7 @@ function tmn_portcheck_mt(&$commands) {
 
 xecho("tmnportcheck v".TMN_VERSION."\n");
 if (($argc < 2) || (($argv[1] != 'db') && ($argv[1] != 'nodb'))) {
-  xecho("Usage: ".basename($argv[0])." [no]db [ip:port:testnet]+\n");
+  xecho("Usage: ".basename($argv[0])." [no]db [ip-port-testnet]+\n");
   die();
 }
 

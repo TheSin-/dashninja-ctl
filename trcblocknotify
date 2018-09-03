@@ -112,10 +112,17 @@ if ($retrieveblocktemplate) {
       }
     }
     $blocktemplate = $rpc->getblocktemplate();
+    $auxblock = $rpc->getauxblock();
     if ($blocktemplate !== false) {
       file_put_contents("/dev/shm/$uname/bt/blocktemplate.".$blocktemplate['height']."_".$protocol."_".$version.".json",json_encode($blocktemplate));
       if ($verbose) {
         echo "OK (ID=".$blocktemplate['height'].")\n";
+      }
+    }
+    else if ($auxblock !== false) {
+      file_put_contents("/dev/shm/$uname/bt/blocktemplate.".$auxblock['height']."_".$protocol."_".$version.".json",json_encode($auxblock));
+      if ($verbose) {
+        echo "OK (ID=".$auxblock['height'].")\n";
       }
     }
     else {

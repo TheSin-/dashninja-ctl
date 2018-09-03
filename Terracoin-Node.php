@@ -26,7 +26,7 @@ use Exception;
 define('PROTOCOL_VERSION',70208);
 define('PROTOCOL_MAGIC',"\x42\xba\xbe\x56");
 define('HRVERSION',"/Terracoin Core:%s/TRC Ninja Port Checker:%s.%d/");
-define('THISVERSION',4);
+define('THISVERSION',5);
 
 function strToHex($string){
     $hex = '';
@@ -71,6 +71,9 @@ class Node {
 					if ($this->version != 0) throw new Exception('Got version packet twice!');
 					$this->_decodeVersionPayload($pkt['payload']);
 					break;
+				case 'reject':
+					$rejectinfo = $this->_decodeRejectPayload($pkt['payload']);
+					throw new EUnexpectedPacketType($pkt['type'].' ['.bin2hex($pkt['type']).'] message='.$rejectinfo["message"].' ccode='.dechex($rejectinfo["ccode"]).' reason='.$rejectinfo["reason"]);
 				default:
 					throw new EUnexpectedPacketType($pkt['type'].' ['.bin2hex($pkt['type']).']');
 			}
@@ -169,6 +172,19 @@ class Node {
 			fwrite($this->sock, $this->_makePacket('verack', NULL));
 	}
 
+	protected function _decodeRejectPayload($data) {
+		$tmp = unpack("cmsgsize",substr($data,0,1));
+		$message = substr($data,1,$tmp["msgsize"]);
+		$tmp = unpack("Cccode",substr($data,$tmp["msgsize"]+1,1));
+		$ccode = $tmp["ccode"];
+		$tmp = unpack("cmsgsize",substr($data,$tmp["msgsize"]+2,1));
+		$reason = substr($data,$tmp["msgsize"]+3,$tmp["msgsize"]);
+
+		return array("message" => $message,
+			         "ccode" => $ccode,
+			         "reason" => $reason);
+	}
+
 	public function readPacket($noqueue = false) {
 		if ((!$noqueue) && ($this->queue)) return array_shift($this->queue);
 		$data = fread($this->sock, 20);
@@ -213,6 +229,7 @@ class Node {
 		$data .= $this->myself;
 		$data .= $this->_string(sprintf(HRVERSION,$sstr,$str,THISVERSION));
 		$data .= pack('V', $nBestHeight);
+		$data .= pack('c', 0);
 
 		return $this->_makePacket('version', $data);
 	}
