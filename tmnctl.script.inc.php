@@ -79,7 +79,7 @@ function tmn_getpayout($mncount,$height) {
 // Retrieve the PIDs for the hub nodes
 function tmn_getpids($nodes,$isstatus = false,$istestnet) {
   if ($isstatus) {
-    $semfnam = ($istestnet?TMN_CTLSTATUSAUTO_TEST_SEMAPHORE:TMN_CTLSTATUSAUTO_MAIN_SEMAPHORE);
+    $semfnam = sprintf(TMN_CTLSTATUSAUTO_SEMAPHORE,$istestnet);
     if (file_exists($semfnam) && (posix_getpgid(intval(file_get_contents($semfnam))) !== false) ) {
       xecho("Already running (PID ".sprintf('%d',file_get_contents($semfnam)).")\n");
       die(10);
@@ -386,7 +386,7 @@ function tmn_help($exename) {
   echo "restart        Restarts nodes                   option1 = testnet|mainnet, option2 = all|masternode|p2pool\n";
   echo "stop           Stop nodes                       option1 = testnet|mainnet, option2 = all|masternode|p2pool\n";
   echo "\n";
-  echo "version        Create a new terracoind version       option1 = binary path\n";
+  echo "version        Create a new terracoind version  option1 = binary path\n";
   echo "                                                option2 = display string\n";
   echo "                                                option3 = testnet only (1 or 0)\n";
   echo "                                                option4 = enabled (1 or 0)\n";
@@ -1657,7 +1657,7 @@ function tmn_status($tmnpid,$istestnet) {
   $mncount = $mncountinactive+$mncountactive;
   if (count($mnlistfinal) > 0) {
     ksort($mnlistfinal,SORT_NATURAL);
-    $estpayoutdaily = round(tmn_getpayout($mncountactive,$terracoindinfo['difficulty']),2);
+    $estpayoutdaily = round(tmn_getpayout($mncountactive,$terracoindinfo['blocks']),2);
   }
   else {
     $estpayoutdaily = '???';
