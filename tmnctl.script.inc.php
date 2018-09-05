@@ -1657,7 +1657,7 @@ function tmn_status($tmnpid,$istestnet) {
   $mncount = $mncountinactive+$mncountactive;
   if (count($mnlistfinal) > 0) {
     ksort($mnlistfinal,SORT_NATURAL);
-    $estpayoutdaily = round(tmn_getpayout($mncountactive,$terracoindinfo['blocks']),2);
+    $estpayoutdaily = round(tmn_getpayout($mncountactive,$terracoindinfo['difficulty']),2);
   }
   else {
     $estpayoutdaily = '???';
@@ -2108,7 +2108,7 @@ elseif (strcasecmp($argv[1],'enable') == 0) {
   tmn_enable($tmnpid,$tmntoenable);
 }
 elseif (strcasecmp($argv[1],'status') == 0) {
-  $semfnam = ($istestnet?TMN_CTLSTATUSAUTO_TEST_SEMAPHORE:TMN_CTLSTATUSAUTO_MAIN_SEMAPHORE);
+  $semfnam = sprintf(TMN_CTLSTATUSAUTO_SEMAPHORE,$istestnet);
   file_put_contents($semfnam,sprintf('%s',getmypid()));
   tmn_status($tmnpidstatus,$istestnet);
   unlink($semfnam);
