@@ -800,6 +800,12 @@ function tmn_status($tmnpid,$istestnet) {
                "datatype" => "mnlistfull",
                "cmd" => $uname . ' "masternode list full"',
                "file" => "/dev/shm/tmnctl/$uname.$tmpdate.masternode_list.json");
+
+           $commands[] = array("status" => 0,
+               "tmnnum" => $tmnnum,
+               "datatype" => "mnlistinfo",
+               "cmd" => $uname . ' "masternode list info"',
+               "file" => "/dev/shm/tmnctl/$uname.$tmpdate.masternode_list_info.json");
        }
       // v12.1 (vh=4)
       if ($tmnpidinfo['versionhandling'] >= 4) {
@@ -1473,6 +1479,9 @@ function tmn_status($tmnpid,$istestnet) {
           }
           else {
               $mn3listfull = $tmnpidinfo['mnlistfull'];
+              if ($tmnpidinfo['versionhandling'] == 4) {
+                  $mn3listinfo = $tmnpidinfo['mnlistinfo'];
+              }
           }
           foreach($mn3listfull as $mn3output => $mn3data) {
             if ($tmnpidinfo['versionhandling'] < 5) {
@@ -1493,6 +1502,12 @@ function tmn_status($tmnpid,$istestnet) {
               list($mn3status, $mn3protocol, $mn3pubkey, $mn3ipport, $mn3lastseen, $mn3activeseconds, $mn3lastpaid) = explode(" ",$mn3data);
             }
             elseif ($tmnpidinfo['versionhandling'] == 4) {
+              $mn3datainfo = trim($mn3listinfo[$mn3output]);
+              do {
+                  $rcount = 0;
+                  $mn3datainfo = str_replace("  ", " ", $mn3datainfo, $rcount);
+              } while ($rcount > 0);
+              list($mn3status, $mn3protocol, $mn3pubkey, $mn3lastseen, $mn3activeseconds, $mn5sentinelversion, $mn5sentinelstate, $mn3ipport) = explode(" ",$mn3datainfo);
               list($mn3status, $mn3protocol, $mn3pubkey, $mn3lastseen, $mn3activeseconds, $mn3lastpaid, $mn4lastpaidblock, $mn3ipport) = explode(" ",$mn3data);
             }
             else {
