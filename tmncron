@@ -37,7 +37,7 @@ fi
 
 # Sequentially run scripts
 #/opt/tmnctl/terracoindupdate >> $updatelog
-/opt/tmnctl/tmnctl status >> $statuslog
+/usr/bin/timeout 5m /opt/tmnctl/tmnctl status >> $statuslog
 #/opt/tmnctl/tmnvotesrrd >> $votesrrdlog
 /usr/bin/php /opt/tmnctl/tmndbgen masternodeactive >> $statuslog
 /usr/bin/php /var/www/trcninja/api/cron.php main nodesstatus >> $statuslog

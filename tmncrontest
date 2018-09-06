@@ -31,7 +31,7 @@ if [[ "$1" == "log" ]]; then
 fi
 
 # Sequentially run scripts
-/opt/tmnctl/tmnctl status testnet >> $statuslog
+/usr/bin/timeout 5m /opt/tmnctl/tmnctl status testnet >> $statuslog
 /usr/bin/php /opt/tmnctl/tmndbgen masternodeactive >> $statuslog
 /usr/bin/php /var/www/trninja/api/cron.php test nodesstatus >> $statuslog
 /usr/bin/php /var/www/trninja/api/cron.php test blocksconsensus >> $statuslog
