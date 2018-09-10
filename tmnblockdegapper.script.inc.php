@@ -31,12 +31,12 @@ if ($argc == 2) {
     if ($argv[1] == "test") {
         $display = "testnet";
         $testnet = 1;
-        $uname = 'tp2pool';
+        $uname = 'ttmn01';
     }
     else {
         $display = "mainnet";
         $testnet = 0;
-        $uname = 'p2pool';
+        $uname = 'tmn01';
     }
 }
 else {
