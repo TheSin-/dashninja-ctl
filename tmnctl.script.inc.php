@@ -718,6 +718,7 @@ function tmn_restartfrozen($tmnpid) {
     else {
       file_put_contents("/tmp/tmnctl-NR-$uname-counter",$counter);
     }
+    xechoToFile(TMN_NRCOUNTLOG,"\n");
   }
   tmn_ctlstartstop($commands);
   foreach($commands as $command) {
