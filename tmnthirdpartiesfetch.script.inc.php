@@ -175,17 +175,35 @@ else {
 // https://bittrex.com/api/v1.1/public/getticker?market=BTC-TRC
 
 xecho("Fetching from CoinMarketCap: ");
-$res = file_get_contents('https://api.coinmarketcap.com/v1/ticker/terracoin/?convert=BTC');
+$res = @file_get_contents('https://api.coinmarketcap.com/v1/ticker/terracoin/?convert=BTC');
+if ($res === false) {
+  xecho("Failed");
+  xecho("Fetching from Backup Source (Services): ");
+  $res = @file_get_contents('https://services.terracoin.io/api/v1/public');
+}
 $resdone = 0;
 if ($res !== false) {
   $res = json_decode($res,true);
-  $res = $res[0];
+  if (array_key_exists('coininfo')) {
+    // Convert to look like the CMC array
+    $coininfo = $res['coininfo'];
+    $rates = $res['exchange_rates'];
+    $res = $res['marketinfo'];
+    $res['symbol'] = $coininfo['symbol'];
+    unset $coininfo;
+    $res['price_btc'] = $rates['btc_trc'];
+    unset $rates;
+    $source = "services via coingecko";
+  } else {
+    $res = $res[0];
+    $source = "coinmarketcap";
+  }
   if (($res !== false) && is_array($res) && array_key_exists('symbol',$res) && ($res['symbol'] == 'TRC') && array_key_exists('last_updated',$res)) {
     $tbstamp = date('Y-m-d H:i:s',$res['last_updated']);
     if (array_key_exists('price_btc',$res)) {
       $tp["btctrc"] = array("StatValue" => $res["price_btc"],
                                   "LastUpdate" => intval($res['last_updated']),
-                                  "Source" => "coinmarketcap");
+                                  "Source" => $source);
       $resdone++;
     }
     else {
@@ -194,7 +212,7 @@ if ($res !== false) {
     if (array_key_exists('rank',$res)) {
       $tp["marketcappos"] = array("StatValue" => $res["rank"],
                                   "LastUpdate" => intval($res['last_updated']),
-                                  "Source" => "coinmarketcap");
+                                  "Source" => $source);
       $resdone++;
     }
     else {
@@ -203,7 +221,7 @@ if ($res !== false) {
     if (array_key_exists('percent_change_24h',$res)) {
       $tp["marketcapchange"] = array("StatValue" => $res["percent_change_24h"],
                                      "LastUpdate" => intval($res['last_updated']),
-                                     "Source" => "coinmarketcap");
+                                     "Source" => $source);
       $resdone++;
     }
     else {
@@ -212,7 +230,7 @@ if ($res !== false) {
     if (array_key_exists('available_supply',$res)) {
       $tp["marketcapsupply"] = array("StatValue" => $res["available_supply"],
                                      "LastUpdate" => intval($res['last_updated']),
-                                     "Source" => "coinmarketcap");
+                                     "Source" => $source);
       $resdone++;
     }
     else {
@@ -221,7 +239,7 @@ if ($res !== false) {
     if (array_key_exists('market_cap_btc',$res)) {
       $tp["marketcapbtc"] = array("StatValue" => $res['market_cap_btc'],
                                   "LastUpdate" => intval($res['last_updated']),
-                                  "Source" => "coinmarketcap");
+                                  "Source" => $source);
       $resdone++;
     }
     else {
@@ -230,7 +248,7 @@ if ($res !== false) {
     if (array_key_exists('market_cap_usd',$res)) {
       $tp["marketcapusd"] = array("StatValue" => $res['market_cap_usd'],
                                   "LastUpdate" => intval($res['last_updated']),
-                                  "Source" => "coinmarketcap");
+                                  "Source" => $source);
       $resdone++;
     }
     else {
@@ -239,7 +257,7 @@ if ($res !== false) {
     if (array_key_exists('market_cap_eur',$res)) {
       $tp["marketcapeur"] = array("StatValue" => $res['market_cap_eur'],
                                   "LastUpdate" => intval($res['last_updated']),
-                                  "Source" => "coinmarketcap");
+                                  "Source" => $source);
       $resdone++;
     }
     else {
@@ -248,7 +266,7 @@ if ($res !== false) {
     if (array_key_exists('24h_volume_usd',$res)) {
       $tp["volumeusd"] = array("StatValue" => $res['24h_volume_usd'],
                                "LastUpdate" => intval($res['last_updated']),
-                               "Source" => "coinmarketcap");
+                               "Source" => $source);
       $resdone++;
     }
     else {
@@ -257,7 +275,7 @@ if ($res !== false) {
     if (array_key_exists('24h_volume_eur',$res)) {
       $tp["volumeeur"] = array("StatValue" => $res['24h_volume_eur'],
                                "LastUpdate" => intval($res['last_updated']),
-                               "Source" => "coinmarketcap");
+                               "Source" => $source);
       $resdone++;
     }
     else {
@@ -266,7 +284,7 @@ if ($res !== false) {
     if (array_key_exists('24h_volume_btc',$res)) {
       $tp["volumebtc"] = array("StatValue" => $res['24h_volume_btc'],
                                "LastUpdate" => intval($res['last_updated']),
-                               "Source" => "coinmarketcap");
+                               "Source" => $source);
       $resdone++;
     }
     else {
