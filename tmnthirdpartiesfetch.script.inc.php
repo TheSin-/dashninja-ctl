@@ -397,7 +397,7 @@ if (strlen($content) > 0) {
   if (($response['http_code'] >= 200) && ($response['http_code'] <= 299)) {
     echo "Success (".$content['data']['thirdparties'].")\n";
   }
-  elseif (($response['http_code'] >= 400) && ($response['http_code'] <= 499)) {
+  elseif (($response['http_code'] >= 400)) {
     echo "Error (".$response['http_code'].": ".$content['messages'][0].")\n";
   }
 }
