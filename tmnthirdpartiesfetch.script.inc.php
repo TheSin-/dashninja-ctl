@@ -190,9 +190,9 @@ if ($res !== false) {
     $rates = $res['exchange_rates'];
     $res = $res['marketinfo'];
     $res['symbol'] = $coininfo['symbol'];
-    unset $coininfo;
+    unset($coininfo);
     $res['price_btc'] = $rates['btc_trc'];
-    unset $rates;
+    unset($rates);
     $source = "services via coingecko";
   } else {
     $res = $res[0];
