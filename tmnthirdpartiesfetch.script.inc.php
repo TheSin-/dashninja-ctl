@@ -177,14 +177,14 @@ else {
 xecho("Fetching from CoinMarketCap: ");
 $res = @file_get_contents('https://api.coinmarketcap.com/v1/ticker/terracoin/?convert=BTC');
 if ($res === false) {
-  xecho("Failed");
+  echo "Failed (GET)\n";
   xecho("Fetching from Backup Source (Services): ");
   $res = @file_get_contents('https://services.terracoin.io/api/v1/public');
 }
 $resdone = 0;
 if ($res !== false) {
   $res = json_decode($res,true);
-  if (array_key_exists('coininfo')) {
+  if (array_key_exists('coininfo', $res)) {
     // Convert to look like the CMC array
     $coininfo = $res['coininfo'];
     $rates = $res['exchange_rates'];
