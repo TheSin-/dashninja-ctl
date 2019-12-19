@@ -194,7 +194,7 @@ if ($res !== false) {
     unset($coininfo);
     $res['price_btc'] = $rates['btc_trc'];
     unset($rates);
-    $source = "services via coingecko";
+    $source = "services";
   } else {
     $res = $res[0];
     $source = "coinmarketcap";
