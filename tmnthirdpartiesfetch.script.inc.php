@@ -190,6 +190,7 @@ if ($res !== false) {
     $rates = $res['exchange_rates'];
     $res = $res['marketinfo'];
     $res['symbol'] = $coininfo['symbol'];
+    $res['available_supply'] = $coininfo['current_supply'];
     unset($coininfo);
     $res['price_btc'] = $rates['btc_trc'];
     unset($rates);
