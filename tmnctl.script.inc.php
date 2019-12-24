@@ -697,7 +697,7 @@ function tmn_restartfrozen($tmnpid) {
       $maxcount = TMN_NRCOUNT;
     }
     if ($counter >= $maxcount) {
-      unlink("/tmp/tmnctl-NR-$uname-counter",$counter);
+      unlink("/tmp/tmnctl-NR-$uname-counter");
       $commands[] = array("status" => 0,
           "nodenum" => $nodenum,
           "cmd" => "$uname stop " . $node['terracoind'],
