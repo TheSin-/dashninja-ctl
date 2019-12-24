@@ -167,7 +167,7 @@ function tmn_getstatus($terracoindinfo,$blockhash) {
                'blockhash' => $blockhash,
                'testnet' => 0);
 
-  if ($terracoindinfo !== false) {
+  if ($terracoindinfo !== false and is_array($terracoindinfo)) {
     if (array_key_exists('version',$terracoindinfo)) {
       $res['version'] = $terracoindinfo['version'];
     }
@@ -950,7 +950,7 @@ function tmn_status($tmnpid,$istestnet) {
           if ($res === false) {
             xecho("Could not decode JSON from ".$command['file']."\n");
           }
-          if (array_key_exists('result',$res)) {
+          if (is_array($res) and array_key_exists('result',$res)) {
             $res = $res['result'];
           }
         }
