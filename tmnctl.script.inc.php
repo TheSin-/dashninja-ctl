@@ -1484,6 +1484,9 @@ function tmn_status($tmnpid,$istestnet) {
                   $mn3listinfo = $tmnpidinfo['mnlistinfo'];
               }
           }
+          if (empty($mn3listfull)) {
+              $mn3listfull = array();
+          }
           foreach($mn3listfull as $mn3output => $mn3data) {
             if ($tmnpidinfo['versionhandling'] < 5) {
                 // Remove all extra spaces
