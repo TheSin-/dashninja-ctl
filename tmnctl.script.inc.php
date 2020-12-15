@@ -1370,8 +1370,10 @@ function tmn_status($tmnpid,$istestnet) {
                 $governancenextsb[$terracoindinfo['testnet']] = intval($tmnpidinfo['getgovernanceinfo']['nextsuperblock']);
               }
               // Store the budget available in next superblock
-              if (($governancebudget[$terracoindinfo['testnet']] === false) || ($governancebudget[$terracoindinfo['testnet']] > floatval($tmnpidinfo['getsuperblockbudget']))) {
-                $governancebudget[$terracoindinfo['testnet']] = floatval($tmnpidinfo['getsuperblockbudget']);
+              if (!empty($tmnpidinfo['getsuperblockbudget'])) {
+                if (($governancebudget[$terracoindinfo['testnet']] === false) || ($governancebudget[$terracoindinfo['testnet']] > floatval($tmnpidinfo['getsuperblockbudget']))) {
+                  $governancebudget[$terracoindinfo['testnet']] = floatval($tmnpidinfo['getsuperblockbudget']);
+                }
               }
               // Parse proposals
               if (is_array($tmnpidinfo["gobjectlist"]) && is_array($tmnpidinfo["gobjectlist"]["proposals"])) {
